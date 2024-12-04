@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>People</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/dist/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.css}">
+    <link rel="stylesheet" type="text/css" href="/css/mystyle.css">
+</head>
+<body>
+<div id="button_panel">
+    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#add_person"
+            data-bs-ident="#add" th:attr="data-bs-link=@{/add_person}">
+        <i class="bi bi-plus"></i>Add person
+    </button>
+</div>
+<div id="main">
+    <table class="table table-hover table-striped table-bordered table-sm">
+        <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th class="w10 center">Age</th>
+            <th class="w20">City</th>
+            <th class="w10 center">Edit</th>
+            <th class="w10 center">Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${people}">
+            <td th:text="${p.name}"></td>
+            <td class="w10 center" th:text="${p.age}"></td>
+            <td class="w20" th:text="${p.city.name}"></td>
+            <td class="w10 center">
+                <a class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#add_person" data-bs-ident="#edit"
+                   th:attr="data-bs-link=@{/update_person}, data-bs-id=${p.id}, data-bs-name=${p.name}, data-bs-age=${p.age}, data-bs-city=${p.city.id}">
+                    <i class="bi bi-pencil"></i>edit</a>
+            </td>
+            <td class="w10 center">
+                <a class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#myconfirm"
+                   th:attr="data-bs-link=@{delete_person(id=${p.id})}, data-bs-text=${p.name}, data-bs-id=${p.id}"><i class="bi bi-trash"></i>delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<!-- confirm dialog -->
+<div class="modal fade" id="myconfirm" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="staticWarningLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5 text-danger" id="staticWarningLabel">Warning</h1>
+                <button type="button" class="btn-close" aria-label="Close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure want to delete <span id="span-txt" class="span-txt text-danger">person</span>?<br/>
+                If you click delete, this <i>cannot be undone</i>!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a class="btn btn-danger delete-button">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- add or edit form -->
+<div class="modal fade" id="add_person" data-bs-backdrop="static" data-bs-keyboard="false"
+     tabindex="-1" aria-labelledby="staticAddLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" id="add_form">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-2" id="staticAddLabel">Add Person</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input id="p_id" type="hidden" name="person_id">
+                    <table>
+                        <tr>
+                            <td><label for="p_name">Name:</label></td>
+                            <td><input id="p_name" type="text" name="person_name"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="p_age">Age:</label></td>
+                            <td><input id="p_age" type="number" name="person_age"></td>
+                        </tr>
+<!--                        <tr>-->
+<!--                            <td><label for="p_city">City:</label></td>-->
+<!--                            <td><input id="p_city" type="text" name="person_city"></td>-->
+<!--                        </tr>-->
+                        <tr>
+                            <td><label for="p_cities_list">City:</label></td>
+                            <td>
+                                <select id="p_cities_list" name="person_city" required>
+                                    <option value="">-- Select city --</option>
+                                    <option th:each="c : ${cities}" th:value="${c.id}" th:text="${c.name}"></option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button id="approve" type="submit" class="btn btn-primary edit-button">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    let myEditDialog = document.getElementById('add_person')
+    myEditDialog.addEventListener('show.bs.modal', function (event) {
+        let button = event.relatedTarget
+        let link = button.getAttribute('data-bs-link')
+        let pname = button.getAttribute('data-bs-name')
+        let page = button.getAttribute('data-bs-age')
+        let pcity = button.getAttribute('data-bs-city')
+        let pid = button.getAttribute('data-bs-id')
+        let hidden = document.getElementById('p_id')
+        let name_edit = document.getElementById('p_name')
+        let age_edit = document.getElementById('p_age')
+        let dialogTitle = myEditDialog.querySelector('.modal-title')
+        let approveButton = document.getElementById('approve')
+        let form = document.getElementById('add_form')
+        form.setAttribute('action', link)
+        if (button.getAttribute('data-bs-ident') === '#add') {
+            hidden.setAttribute('value', '0')
+            name_edit.setAttribute('value', '')
+            age_edit.setAttribute('value', '0')
+            dialogTitle.textContent = 'Add person'
+            approveButton.textContent = 'Add person'
+        } else {
+            dialogTitle.textContent = 'Edit person'
+            approveButton.textContent = 'Update person'
+            hidden.setAttribute('value', pid)
+            name_edit.setAttribute('value', pname)
+            age_edit.setAttribute('value', page)
+            let select = document.getElementById('p_cities_list')
+            for (let i = 0; i < select.length; i++) {
+                let option = select[i];
+                if (option.value === pcity) {
+                    option.setAttribute('selected', 'selected')
+                } else {
+                    option.removeAttribute('selected')
+                }
+            }
+        }
+    })
+</script>
+
+<script>
+    let myConfirmDialog=document.getElementById('myconfirm')
+    myConfirmDialog.addEventListener('show.bs.modal' , function(event){
+        let button = event.relatedTarget
+        let link = button.getAttribute('data-bs-link')
+        let pid = button.getAttribute('data-bs-id')
+        let text = button.getAttribute('data-bs-text')
+        let modalTitle = myConfirmDialog.querySelector('.modal-title')
+        modalTitle.textContent = 'Delete: ' + text + ' (' + pid + ')'
+        let modalText = myConfirmDialog.querySelector('.span-txt')
+        modalText.textContent = text + ' (' + pid + ')'
+        let deleteButton = myConfirmDialog.querySelector('.delete-button')
+        deleteButton.setAttribute('href', link)
+    })
+</script>
+
+<script th:src="@{/webjars/bootstrap/5.3.3/dist/js/bootstrap.js}"></script>
+</body>
+</html>
