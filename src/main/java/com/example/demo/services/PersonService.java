@@ -41,4 +41,8 @@ public class PersonService {
            });
         });
     }
+
+    public void deletePerson(int pid) {
+        personRepository.deleteById(pid);
+    }
 }

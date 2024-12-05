@@ -43,5 +43,11 @@ public class PersonController {
         personService.updatePerson(pid, name, age, cityId);
         return "redirect:/people";
     }
+
+    @GetMapping("/delete_person")
+    public String deletePerson(@RequestParam("id") int pid) {
+        personService.deletePerson(pid);
+        return "redirect:/people";
+    }
 }
 
