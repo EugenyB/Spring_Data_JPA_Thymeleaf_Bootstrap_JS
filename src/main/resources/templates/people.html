@@ -84,10 +84,6 @@
                             <td><label for="p_age">Age:</label></td>
                             <td><input id="p_age" type="number" name="person_age"></td>
                         </tr>
-<!--                        <tr>-->
-<!--                            <td><label for="p_city">City:</label></td>-->
-<!--                            <td><input id="p_city" type="text" name="person_city"></td>-->
-<!--                        </tr>-->
                         <tr>
                             <td><label for="p_cities_list">City:</label></td>
                             <td>
@@ -110,6 +106,18 @@
     </div>
 </div>
 <script>
+    function selectElement(str, value) {
+        let select = document.getElementById(str)
+        for (let i = 0; i < select.length; i++) {
+            let option = select[i];
+            if (option.value === value) {
+                option.setAttribute('selected', 'selected')
+            } else {
+                option.removeAttribute('selected')
+            }
+        }
+    }
+
     let myEditDialog = document.getElementById('add_person')
     myEditDialog.addEventListener('show.bs.modal', function (event) {
         let button = event.relatedTarget
@@ -125,6 +133,7 @@
         let approveButton = document.getElementById('approve')
         let form = document.getElementById('add_form')
         form.setAttribute('action', link)
+
         if (button.getAttribute('data-bs-ident') === '#add') {
             hidden.setAttribute('value', '0')
             name_edit.setAttribute('value', '')
@@ -137,15 +146,7 @@
             hidden.setAttribute('value', pid)
             name_edit.setAttribute('value', pname)
             age_edit.setAttribute('value', page)
-            let select = document.getElementById('p_cities_list')
-            for (let i = 0; i < select.length; i++) {
-                let option = select[i];
-                if (option.value === pcity) {
-                    option.setAttribute('selected', 'selected')
-                } else {
-                    option.removeAttribute('selected')
-                }
-            }
+            selectElement('p_cities_list', pcity);
         }
     })
 </script>

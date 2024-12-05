@@ -24,7 +24,7 @@ public class PersonController {
     @GetMapping("/people")
     public String getAll(Model model) {
         model.addAttribute("people", personService.findAll());
-                model.addAttribute("cities", cityService.findAll());
+        model.addAttribute("cities", cityService.findAll());
         return "people";
     }
 
